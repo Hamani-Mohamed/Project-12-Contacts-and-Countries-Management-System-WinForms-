@@ -1,4 +1,4 @@
-📇 Contacts Management System (C# WinForms – 3-Tier Architecture)
+# 📇 Contacts Management System (C# WinForms – 3-Tier Architecture)
 ## 📖 About the Project
 A Windows Forms desktop application for managing contacts, built using C# and a clean 3-tier architecture.
 The system allows users to add, edit, delete, and view contacts, with full integration to SQL Server, Countries, and optional contact images.
