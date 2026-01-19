@@ -1,0 +1,67 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using ContactsBusinessLayer;
+
+namespace ContactsWindowsFormsPresentation
+{
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        public void _RefreshContactsList()
+        {
+            dgvAllContacts.DataSource = clsContact._GetAllContacts();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            _RefreshContactsList();
+        }
+
+        private void dgvViewContacts_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            MessageBox.Show(dgvAllContacts.CurrentRow.Cells[0].Value.ToString());
+        }
+
+        private void cmsEdit_Click(object sender, EventArgs e)
+        {
+            Form frm = new frmAddEditContact((int)dgvAllContacts.CurrentRow.Cells[0].Value);
+            frm.ShowDialog();
+            _RefreshContactsList();
+        }
+
+        private void cmsDelete_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Are you sure you want to delete [" + dgvAllContacts.CurrentRow.Cells[0].Value.ToString()
+                + "] permanently?", "Confirm Deletion", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) == DialogResult.OK)
+            {
+                if (clsContact.DeleteContact((int)dgvAllContacts.CurrentRow.Cells[0].Value))
+                {
+                    MessageBox.Show("Contact Deleted Successfully!", "Deletion successful!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    _RefreshContactsList();
+                }
+            }
+            else
+            {
+                MessageBox.Show("Deletion Canceled!", "Canceled!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
+        private void btnAdd_Click(object sender, EventArgs e)
+        {
+            Form frm = new frmAddEditContact(-1);
+            frm.ShowDialog();
+            _RefreshContactsList();
+        }
+    }
+}
