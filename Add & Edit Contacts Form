@@ -1,0 +1,149 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using ContactsBusinessLayer;
+using CountriesBusinessLayer;
+
+namespace ContactsWindowsFormsPresentation
+{
+    public partial class frmAddEditContact : Form
+    {
+        public enum enMode { AddNew, Update };
+        enMode _Mode;
+        int _ContactID;
+        clsContact _Contact;
+
+        public frmAddEditContact(int ContactID)
+        {
+            InitializeComponent();
+
+            _ContactID = ContactID;
+
+            if (_ContactID == -1)
+                _Mode = enMode.AddNew;
+            else
+                _Mode = enMode.Update;
+        }
+
+        private void _FillCountriesInComboBox()
+        {
+            cbCountry.Items.Clear();
+            DataTable dt = clsCountry._GetAllCountries();
+
+            foreach (DataRow row in dt.Rows)
+            {
+                cbCountry.Items.Add(row["CountryName"]);
+            }
+        }
+
+        private void _LoadData()
+        {
+            _FillCountriesInComboBox();
+            cbCountry.SelectedIndex = 0;
+
+            if (_Mode == enMode.AddNew)
+            {
+                _Contact = new clsContact();
+                return;
+            }
+
+            _Contact = clsContact.Find(_ContactID);
+
+            if (_Contact == null)
+            {
+                MessageBox.Show("This form will be closed because No Contact with ID = " + _ContactID);
+                this.Close();
+                return;
+            }
+
+            lblTitle.Text = "Edit Contact " + _ContactID;
+            lblID.Text = _ContactID.ToString();
+            txtFirstname.Text = _Contact.FirstName;
+            txtLastName.Text = _Contact.LastName;
+            txtEmail.Text = _Contact.Email;
+            txtPhone.Text = _Contact.Phone;
+            txtAddress.Text = _Contact.Address;
+            dtpDate.Value = _Contact.DateOfBirth;
+
+            if (_Contact.ImagePath != "")
+                pic.Load(_Contact.ImagePath);
+
+            lblRemoveImage.Visible = (_Contact.ImagePath != "");
+
+            //this will select the country in the combobox.
+            cbCountry.SelectedIndex = cbCountry.FindString(clsCountry.Find(_Contact.CountryID).CountryName);
+        }
+
+        private void frmAddEditContact_Load(object sender, EventArgs e)
+        {
+            _LoadData();
+        }
+
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+            int CountryID = clsCountry.Find(cbCountry.Text).ID;
+
+            _Contact.FirstName = txtFirstname.Text;
+            _Contact.LastName = txtLastName.Text;
+            _Contact.Email = txtEmail.Text;
+            _Contact.Phone = txtPhone.Text;
+            _Contact.Address = txtAddress.Text;
+            _Contact.DateOfBirth = dtpDate.Value;
+            _Contact.CountryID = CountryID;
+
+            if (pic.ImageLocation != null)
+            {
+                _Contact.ImagePath = pic.ImageLocation;
+                lblRemoveImage.Visible = true;
+            }
+            else
+                _Contact.ImagePath = "";
+
+            if (_Contact.Save())
+            {
+                _ContactID = _Contact.ID;
+                MessageBox.Show("New Contact Data saved successfully!", "Saved!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+                MessageBox.Show("New Contact Data not saved!", "Cancelled!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
+            _Mode = enMode.Update;
+            lblTitle.Text = "Edit Contact " + _ContactID;
+            lblID.Text = _ContactID.ToString();
+        }
+
+        private void btnClose_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void lblSetImage_Click(object sender, EventArgs e)
+        {
+            openFileDialog1.Filter = "Image Files|*.jpg;*.jpeg;*.png;*.gif;*.bmp";
+            openFileDialog1.FilterIndex = 1;
+            openFileDialog1.RestoreDirectory = true;
+
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                // Process the selected file
+                string selectedFilePath = openFileDialog1.FileName;
+                //MessageBox.Show("Selected Image is:" + selectedFilePath);
+
+                pic.Load(selectedFilePath);
+                // ...
+            }
+        }
+
+        private void lblRemoveImage_Click(object sender, EventArgs e)
+        {
+            pic.ImageLocation = null;
+            lblRemoveImage.Visible = false;
+        }
+    }
+}
