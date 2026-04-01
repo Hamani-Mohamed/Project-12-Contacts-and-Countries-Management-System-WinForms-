@@ -25,7 +25,7 @@ It is also the extension / WinForms Presentation Layer of https://github.com/Ham
 
 ## 🛠️ Technologies Used
 
-C#
+* **C#**
 
 .NET Framework
 
