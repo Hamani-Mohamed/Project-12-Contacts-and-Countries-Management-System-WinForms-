@@ -26,7 +26,7 @@ It is also the extension / WinForms Presentation Layer of https://github.com/Ham
 ## 🛠️ Technologies Used
 
 * **C#**
-* * **.NET Framework**
+* **.NET Framework**
 * **Windows Forms (WinForms)**
 * **ADO.NET**
 * **SQL Server**
